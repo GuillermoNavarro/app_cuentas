@@ -3,6 +3,7 @@ const app = express();
 const routes = require("./routes/test.routes")
 const reciboRoutes = require("./routes/recibo.routes")
 
+app.use(express.json());
 app.use(routes);
 app.use(reciboRoutes);
 
