@@ -29,6 +29,25 @@ const borrarRecibo = async (id_recibo) => {
     return registro.affectedRows > 0;
 }
 
+const resumenAnual = async (id_hogar, fecha) => {
+    const fechaInicio = new Date(fecha);
+    const fechaFin = new Date(fecha);
+    fechaInicio.setMonth(fechaInicio.getMonth() - 3);
+    fechaFin.setMonth(fechaFin.getMonth() + 9);
+    const query = `
+        SELECT 
+            DATE_FORMAT(fecha, '%Y-%m') as mes, 
+            SUM(IF(tipo='gasto',importe,0)) as gasto, 
+            SUM(IF(tipo='ingreso',importe,0)) as ingreso 
+        FROM recibo 
+        WHERE id_hogar = ? AND fecha between ? and ?
+        GROUP BY mes;
+    `;
+
+    const [registro] = await pool.promise().query(query, [id_hogar, fechaInicio.toISOString().split('T')[0], fechaFin.toISOString().split('T')[0]]);
+    return registro;
+}
+
 
 
 module.exports = {
@@ -36,5 +55,6 @@ module.exports = {
     crearRecibo,
     modificarEstado,
     modificarRecibo,
-    borrarRecibo
+    borrarRecibo,
+    resumenAnual
 };
