@@ -24,13 +24,16 @@ const obtenerPrevisto = async (id_previsto) => {
 const modificarPrevisto = async (id_previsto, detalle, fechaInicio, fechaFin, importe, tipo, id_hogar) => {
     const [recibo] = await pool.promise().query("SELECT min(fecha) AS primera_fecha FROM recibo WHERE id_previsto = ? AND estado = false", [id_previsto]);
     let fechaActual;
+    const fecha_fin = new Date(fechaFin);
+    const fecha_inicio = new Date(fechaInicio);
     if(recibo[0].primera_fecha === null){
         fechaActual = new Date(fechaInicio);
     }else{
-        fechaActual = fechaInicio >= recibo[0].primera_fecha ? new Date(fechaInicio) : new Date(recibo[0].primera_fecha) ;
+        const fechaUsuario = new Date (recibo[0].primera_fecha);
+        fechaActual = fecha_inicio >= fechaUsuario ? fecha_inicio : fechaUsuario ;
     }
     
-    const [previsto] = await pool.promise().query("UPDATE previsto SET detalle = ?, fecha_inicio = ?, fecha_fin = ?, importe = ?, tipo = ? WHERE id_previsto = ?", [detalle, fechaInicio, fechaFin, importe, tipo, id_previsto]);
+    const [previsto] = await pool.promise().query("UPDATE previsto SET detalle = ?, fecha_fin = ?, importe = ?, tipo = ? WHERE id_previsto = ?", [detalle, fecha_fin.toISOString().split('T')[0], importe, tipo, id_previsto]);
     const [registro] = await pool.promise().query("DELETE FROM recibo WHERE id_previsto = ? AND estado = false AND fecha >= ?", [id_previsto, fechaInicio]);
    
     const fecha = new Date(fechaFin);

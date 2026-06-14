@@ -5,6 +5,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const routes = require("./routes/test.routes")
 const reciboRoutes = require("./routes/recibo.routes")
 const previstoRoutes = require("./routes/previsto.router");
+const usuarioRoutes = require("./routes/usuario.routes");
 
 const swaggerSpec = {
     definition: {
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(routes);
 app.use(reciboRoutes);
 app.use(previstoRoutes);
+app.use(usuarioRoutes);
 
 app.listen(3001, () => {
     console.log("Servidor encendido en el puerto 3001");
