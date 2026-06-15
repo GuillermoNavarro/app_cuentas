@@ -18,6 +18,22 @@ const patchUsuario = async (req, res) => {
     }
 };
 
+const postLogin = async (req, res) => {
+    try{
+        const {email, password} = req.body;
+
+        const token = await usuarioService.login(email, password);
+        res.status(200).json(token);
+    }catch(err) {
+        if(err.message === "INVALID_CREDENTIALS"){
+            return res.status(403).json({error: "Email o Constraseña incorrecta"});
+        }
+        console.error("Error al logarse", err);
+        res.status(500).json({error: "Error interno del servidor"});
+    }
+};
+
 module.exports = {
-    patchUsuario
+    patchUsuario,
+    postLogin
 };
