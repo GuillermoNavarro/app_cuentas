@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const reciboController = require("../controllers/recibo.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 /**
  * @swagger
@@ -21,7 +22,7 @@ const reciboController = require("../controllers/recibo.controller");
  *       500:
  *         description: Error interno del servidor
  */
-router.get("/api/v1/recibos/:id_hogar", reciboController.getRecibos);
+router.get("/api/v1/recibos/:id_hogar", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.getRecibos);
 
 /**
  * @swagger
@@ -63,11 +64,11 @@ router.get("/api/v1/recibos/:id_hogar", reciboController.getRecibos);
  *       500:
  *         description: Error interno del servidor
  */
-router.post("/api/v1/recibos", reciboController.postRecibos);
+router.post("/api/v1/recibos", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.postRecibos);
 
 
-router.patch("/api/v1/recibos/:id_recibo", reciboController.patchEstado);
-router.put("/api/v1/recibos/:id_recibo", reciboController.putRecibo);
-router.delete("/api/v1/recibos/:id_recibo", reciboController.deleteRecibo);
+router.patch("/api/v1/recibos/:id_recibo", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.patchEstado);
+router.put("/api/v1/recibos/:id_recibo", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.putRecibo);
+router.delete("/api/v1/recibos/:id_recibo", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.deleteRecibo);
 
 module.exports = router;
