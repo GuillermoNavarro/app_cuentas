@@ -22,7 +22,10 @@ const authMiddleware = require("../middlewares/auth.middleware");
  *       500:
  *         description: Error interno del servidor
  */
-router.get("/api/v1/recibos/:id_hogar", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.getRecibos);
+router.get("/api/v1/recibos", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.getRecibos);
+
+router.get("/api/v1/resumen", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.getResumen);
+
 
 /**
  * @swagger

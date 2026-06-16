@@ -2,7 +2,8 @@ const previstoService = require("../services/previsto.service");
 
 const postPrevistos = async (req, res) => {
     try{
-        const {detalle, fecha_inicio, fecha_fin, importe, tipo, id_hogar} = req.body;
+        const {detalle, fecha_inicio, fecha_fin, importe, tipo} = req.body;
+        const id_hogar = req.usuario.id_hogar;
 
         if (tipo != "gasto" && tipo != "ingreso") {
             return res.status(400).json({error: "El tipo debe ser ingreso o gasto"});
@@ -20,7 +21,11 @@ const postPrevistos = async (req, res) => {
 const getPrevisto = async (req, res) => {
     try{
         const id_previsto = req.params.id_previsto;
-        const previsto = await previstoService.obtenerPrevisto(id_previsto);
+        const id_hogar = req.usuario.id_hogar;
+        const previsto = await previstoService.obtenerPrevisto(id_previsto, id_hogar);
+        if(previsto.length === 0){
+            return res.status(404).json({error: "Previsto no encontrado"});
+        }
         res.json(previsto);
     }catch (err) {
         console.error("Error al obtener el previsto", err);
@@ -30,7 +35,8 @@ const getPrevisto = async (req, res) => {
 
 const putPrevisto = async (req, res) => {
     try{
-        const {id_previsto, detalle, fecha_inicio, fecha_fin, importe, tipo, id_hogar} = req.body;
+        const {id_previsto, detalle, fecha_inicio, fecha_fin, importe, tipo} = req.body;
+        const id_hogar = req.usuario.id_hogar;
 
         if (tipo != "gasto" && tipo != "ingreso") {
             return res.status(400).json({error: "El tipo debe ser ingreso o gasto"});
@@ -55,7 +61,8 @@ const putPrevisto = async (req, res) => {
 const deletePrevisto = async (req, res) => {
     try{
         const id_previsto = req.params.id_previsto;
-        const previsto = await previstoService.borrarPrevisto(id_previsto);
+        const id_hogar = req.usuario.id_hogar;
+        const previsto = await previstoService.borrarPrevisto(id_previsto, id_hogar);
          if(previsto){
             res.status(200).json({
                 success: previsto

@@ -1,7 +1,11 @@
 const pool = require("../config/db");
 
-const obtenerTodos = async (id_hogar) => {
-    const [filas] = await pool.promise().query("SELECT * FROM recibo WHERE id_hogar = ?", [id_hogar]);
+const obtenerTodos = async (id_hogar, mes, anio) => {
+    
+    const primerDia = new Date(anio, mes - 1, 1);
+    const ultimoDia = new Date(anio, mes, 0);
+
+    const [filas] = await pool.promise().query("SELECT * FROM recibo WHERE id_hogar = ? AND fecha BETWEEN ? AND ?", [id_hogar, primerDia.toISOString().split('T')[0], ultimoDia.toISOString().split('T')[0]]);
     return filas;
 };
 
@@ -12,20 +16,20 @@ const crearRecibo = async (id_previsto, id_hogar, fecha, importe, tipo, detalle)
     return registro;
 }
 
-const modificarEstado = async (id_recibo) => {
+const modificarEstado = async (id_recibo, id_hogar) => {
         
-    const [registro] = await pool.promise().query("UPDATE recibo SET estado = !estado WHERE id_recibo = ?", [id_recibo]);
-    return registro;
+    const [registro] = await pool.promise().query("UPDATE recibo SET estado = !estado WHERE id_recibo = ? AND id_hogar = ?", [id_recibo, id_hogar]);
+    return registro.affectedRows > 0;
 }
 
-const modificarRecibo = async (id_recibo, fecha, importe, tipo, detalle) => {
-    const [registro] = await pool.promise().query("UPDATE recibo SET fecha = ?, importe = ?, tipo = ?, detalle = ? WHERE id_recibo = ?", [fecha, importe, tipo, detalle, id_recibo]);
-    return registro;
+const modificarRecibo = async (id_recibo, fecha, importe, tipo, detalle, id_hogar) => {
+    const [registro] = await pool.promise().query("UPDATE recibo SET fecha = ?, importe = ?, tipo = ?, detalle = ? WHERE id_recibo = ? AND id_hogar = ?", [fecha, importe, tipo, detalle, id_recibo,  id_hogar]);
+    return registro.affectedRows > 0;
 
 }
 
-const borrarRecibo = async (id_recibo) => {
-    const [registro] = await pool.promise().query("DELETE FROM recibo WHERE id_recibo = ?", [id_recibo]);
+const borrarRecibo = async (id_recibo, id_hogar) => {
+    const [registro] = await pool.promise().query("DELETE FROM recibo WHERE id_recibo = ? AND id_hogar = ?", [id_recibo, id_hogar]);
     return registro.affectedRows > 0;
 }
 
