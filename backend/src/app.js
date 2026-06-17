@@ -14,7 +14,17 @@ const swaggerSpec = {
             title: "API de Gestión de Cuentas",
             version: "1.0.0",
         },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                },
+            },
+        },
     },
+    
     apis: ["./src/routes/*.js"],
 };
 

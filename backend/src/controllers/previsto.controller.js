@@ -35,7 +35,8 @@ const getPrevisto = async (req, res) => {
 
 const putPrevisto = async (req, res) => {
     try{
-        const {id_previsto, detalle, fecha_inicio, fecha_fin, importe, tipo} = req.body;
+        const {detalle, fecha_inicio, fecha_fin, importe, tipo} = req.body;
+        const id_previsto = req.params.id_previsto;
         const id_hogar = req.usuario.id_hogar;
 
         if (tipo != "gasto" && tipo != "ingreso") {
