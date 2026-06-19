@@ -2,6 +2,8 @@
   import { ref } from 'vue';
   import Login from './components/loguin.vue';
   import Navbar from './components/navbar.vue'
+  import resumen from './components/resumen.vue';
+  import Resumen from './components/resumen.vue';
   const cerrarLogin = ref(localStorage.getItem('token') ? true : false);
   const vistaActual = ref('resumen');  
 
@@ -10,7 +12,7 @@
 <template>
   <h1 class="titulo">Gestion de Cuentas del Hogar</h1>
   <Login @usuarioLogado="cerrarLogin=true"  v-if="!cerrarLogin"/>
-  <h2 v-if="vistaActual === 'resumen'">Resumen</h2>
+  <Resumen v-if="vistaActual === 'resumen'" />
   <h2 v-if="vistaActual === 'detalle'">Detalle</h2>
   <h2 v-if="vistaActual === 'nuevo'">Nuevo</h2>
   <h2 v-if="vistaActual === 'usuario'">Usuario</h2>
