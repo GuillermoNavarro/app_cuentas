@@ -1,16 +1,23 @@
 <script setup>
     import { onMounted } from 'vue';
-    import { resumen } from '../servicios/reciboService';
+    import { reciboMensual } from '../servicios/reciboService';
+    import { cambiarEstado } from '../servicios/reciboService';
     import { ref } from 'vue';
 
-    const emit = defineEmits(['verDetalle']);
+    const props = defineProps(['mesRecibido', 'usuarioDeslogado']);
+    const emit = defineEmits(['modificarRecibo']);
 
     const fecha = `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}`;
-    const fechaSeleccionada = ref(fecha);
+    const fechaSeleccionada = ref(props.mesRecibido || fecha);
     const datos = ref(null);
 
     const cargarDatos = async () => {
-        datos.value = await resumen(fechaSeleccionada.value);
+        datos.value = await reciboMensual(fechaSeleccionada.value);
+    }
+
+    const modificarEstado = async (id_recibo) => {
+        await cambiarEstado (id_recibo);
+        cargarDatos();
     }
 
     onMounted(async () => {
@@ -24,22 +31,22 @@
         <input class="calendario" type="month" v-model="fechaSeleccionada" @change="cargarDatos()">
     </div>
     <div v-if="datos" class="contenedor">
-        <div v-for="mesDatos in datos" :key="mesDatos.mes" class="fila_mes" @click="emit('verDetalle', mesDatos.mes)">
+        <div v-for="recibo in datos" :key="recibo.id_recibo" class="fila_mes" @click="emit('modificarRecibo', recibo)">
             <div class="col_fechas">
-                <strong>{{ mesDatos.mes }}</strong>
+                <strong>{{ recibo.fecha?.split("T")[0] }}</strong>
             </div>
             <div class="col_movimientos">
-                <span class="ingreso">Ingresos: {{ mesDatos.ingreso }}€</span>
-                <span class="gasto">Gastos: {{mesDatos.gasto}}€</span>
+                <strong class="ingreso">{{ recibo.detalle }}</Strong>
+                <span class="gasto">{{recibo.tipo === "gasto" ? recibo.importe * -1 : recibo.importe}}€</span>
             </div>
             <div class="col_saldo">
-                <strong>Saldo:</strong>
-                <strong :class="(mesDatos.ingreso - mesDatos.gasto) > 0 ? 'positivo' : 'negativo'">{{ mesDatos.ingreso - mesDatos.gasto}}€</strong>
+                <strong>Estado:</strong>
+                <span @click.stop="modificarEstado(recibo.id_recibo)"> {{ recibo.estado ? "Pagado" : "Pendiente" }} </span>
             </div>
         </div>
     </div>
     <div v-else>
-        <h3>Cargando datos del resumen...</h3>
+        <h3>Cargando datos del mes...</h3>
     </div>
    
 </template>

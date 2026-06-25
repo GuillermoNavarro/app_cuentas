@@ -2,26 +2,39 @@
   import { ref } from 'vue';
   import Login from './components/loguin.vue';
   import Navbar from './components/navbar.vue'
-  import resumen from './components/resumen.vue';
   import Resumen from './components/resumen.vue';
+  import Recibos from './components/recibos.vue';
+  import Formulario from './components/formulario.vue';
   const cerrarLogin = ref(localStorage.getItem('token') ? true : false);
-  const vistaActual = ref('resumen');  
+  const vistaActual = ref('detalle');  
+  const reciboSeleccionado = ref(null);
+  const mesSeleccionado = ref(null);
+
+  const prepararEdicion = (recibo) => {
+    reciboSeleccionado.value = recibo;
+    vistaActual.value = 'nuevo';
+  }
+
+  const verDetalle = (mes) => {
+    mesSeleccionado.value = mes;
+    vistaActual.value ='detalle';
+  }
 
 </script>
 
 <template>
   <h1 class="titulo">Gestion de Cuentas del Hogar</h1>
   <Login @usuarioLogado="cerrarLogin=true"  v-if="!cerrarLogin"/>
-  <Resumen v-if="vistaActual === 'resumen'" />
-  <h2 v-if="vistaActual === 'detalle'">Detalle</h2>
-  <h2 v-if="vistaActual === 'nuevo'">Nuevo</h2>
-  <h2 v-if="vistaActual === 'usuario'">Usuario</h2>
+  <Resumen v-if="vistaActual === 'resumen' && cerrarLogin" @verDetalle="verDetalle"/>
+  <Recibos v-if="vistaActual === 'detalle' && cerrarLogin" @modificarRecibo="prepararEdicion" :mesRecibido="mesSeleccionado"/>
+  <Formulario v-if="vistaActual === 'nuevo' && cerrarLogin" @volverDetalle="vistaActual ='detalle'" :datosRecibo="reciboSeleccionado"/>
+  <h2 v-if="vistaActual === 'usuario' && cerrarLogin">Usuario</h2>
   <Navbar
     v-if="cerrarLogin"
     :vistaActual="vistaActual"
     @irResumen="vistaActual = 'resumen'"
-    @irDetalle="vistaActual = 'detalle'"
-    @irNuevo="vistaActual = 'nuevo'"
+    @irDetalle="vistaActual = 'detalle'; verDetalle(null)"
+    @irNuevo="vistaActual = 'nuevo'; prepararEdicion(null)"
     @irUsuario="vistaActual = 'usuario'"
     @usuarioDeslogado="cerrarLogin=false" />
 </template>
