@@ -44,7 +44,13 @@ const login = async (email, password) => {
 
 };
 
+const usuariosIdHogar = async(id_hogar) => {
+    const [usuario] = await pool.promise().query("SELECT nombre, email FROM usuario WHERE id_hogar = ?", [id_hogar]);
+    return usuario;
+}
+
 module.exports = {
     cambioPass,
-    login
+    login,
+    usuariosIdHogar
 };

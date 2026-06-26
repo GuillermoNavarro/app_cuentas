@@ -64,4 +64,22 @@ router.patch("/api/v1/usuario", authMiddleware.verificarToken, usuarioController
  */
 router.post("/api/v1/login", usuarioController.postLogin);
 
+/**
+ * @swagger
+ * /api/v1/usuario:
+ *   get:
+ *     summary: Usuarios en id_hogar
+ *     tags: [Usuarios]
+ *     security:
+ *     - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada
+ *       403:
+ *         description: La constraseña antigua no es correcta
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.get("/api/v1/usuario", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, usuarioController.getUsuario);
+
 module.exports = router;

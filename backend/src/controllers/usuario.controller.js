@@ -32,7 +32,19 @@ const postLogin = async (req, res) => {
     }
 };
 
+const getUsuario = async (req, res) => {
+    try{
+        const id_hogar = req.usuario.id_hogar;
+        const usuarios = await usuarioService.usuariosIdHogar(id_hogar);
+        res.json(usuarios);
+    }catch (err) {
+        console.error("Error al obtener usuarios", err);
+        res.status(500).json({error: "Error interno del servidor"});
+    }
+}
+
 module.exports = {
     patchUsuario,
-    postLogin
+    postLogin,
+    getUsuario
 };
