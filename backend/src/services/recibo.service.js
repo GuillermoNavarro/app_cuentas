@@ -22,6 +22,12 @@ const modificarEstado = async (id_recibo, id_hogar) => {
     return registro.affectedRows > 0;
 }
 
+const modificarImporte = async (id_recibo, id_hogar, importe) => {
+        
+    const [registro] = await pool.promise().query("UPDATE recibo SET importe = ? WHERE id_recibo = ? AND id_hogar = ?", [importe, id_recibo, id_hogar]);
+    return registro.affectedRows > 0;
+}
+
 const modificarRecibo = async (id_recibo, fecha, importe, tipo, detalle, id_hogar) => {
     const [registro] = await pool.promise().query("UPDATE recibo SET fecha = ?, importe = ?, tipo = ?, detalle = ? WHERE id_recibo = ? AND id_hogar = ?", [fecha, importe, tipo, detalle, id_recibo,  id_hogar]);
     return registro.affectedRows > 0;
@@ -60,5 +66,6 @@ module.exports = {
     modificarEstado,
     modificarRecibo,
     borrarRecibo,
-    resumenAnual
+    resumenAnual,
+    modificarImporte
 };

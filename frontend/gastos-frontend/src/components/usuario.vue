@@ -20,6 +20,7 @@
             const respuesta = await cambioPass(datos.value);
             if(respuesta){
                 window.alert("Contraseña cambiada");
+                window.location.reload();
             }
         }else{
             window.alert("Las constraseñas no coinciden");

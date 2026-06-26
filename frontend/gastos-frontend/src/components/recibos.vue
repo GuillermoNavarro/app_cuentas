@@ -1,8 +1,6 @@
 <script setup>
-    import { onMounted } from 'vue';
-    import { reciboMensual } from '../servicios/reciboService';
-    import { cambiarEstado } from '../servicios/reciboService';
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue';
+    import { reciboMensual, cambiarEstado, cambiarImporte } from '../servicios/reciboService';
 
     const props = defineProps(['mesRecibido', 'usuarioDeslogado']);
     const emit = defineEmits(['modificarRecibo']);
@@ -10,6 +8,18 @@
     const fecha = `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2, '0')}`;
     const fechaSeleccionada = ref(props.mesRecibido || fecha);
     const datos = ref(null);
+
+    const reciboEditando = ref(null);
+    const importeTemporal = ref(0);
+
+    const activarEdicion = (recibo) => {
+        reciboEditando.value = recibo.id_recibo;
+        importeTemporal.value = recibo.importe;
+    }
+
+    const cancelarEdicion = () => {
+        reciboEditando.value = null;
+    }
 
     const cargarDatos = async () => {
         datos.value = await reciboMensual(fechaSeleccionada.value);
@@ -20,6 +30,30 @@
         cargarDatos();
     }
 
+    const guardarImporte = async (recibo) => {
+        const datos = {
+            id_recibo: recibo.id_recibo,
+            importe: importeTemporal.value
+        };
+        await cambiarImporte (datos);
+        reciboEditando.value = null
+        cargarDatos();
+    }
+
+    const retrocedeMes = () => {
+        const fecha = new Date(fechaSeleccionada.value + '-01')
+        fecha.setMonth(fecha.getMonth() - 1)
+        fechaSeleccionada.value = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2, '0')}`
+        cargarDatos();
+    }
+
+     const avanzarMes = () => {
+        const fecha = new Date(fechaSeleccionada.value + '-01')
+        fecha.setMonth(fecha.getMonth() + 1)
+        fechaSeleccionada.value = `${fecha.getFullYear()}-${(fecha.getMonth()+1).toString().padStart(2, '0')}`
+        cargarDatos();
+    }
+
     onMounted(async () => {
         cargarDatos();
     })
@@ -27,8 +61,12 @@
 
 <template>
     <div class="fecha">
-        <span>Selección de fecha: </span>
-        <input class="calendario" type="month" v-model="fechaSeleccionada" @change="cargarDatos()">
+        <button class="btn_mes" @click="retrocedeMes"><span class="material-symbols-outlined">chevron_left</span></button>
+        <div>
+            <span>Selección de fecha: </span>
+            <input class="calendario" type="month" v-model="fechaSeleccionada" @change="cargarDatos()">
+        </div>
+        <button class="btn_mes" @click="avanzarMes"><span class="material-symbols-outlined">chevron_right</span></button>
     </div>
     <div v-if="datos" class="contenedor">
         <div v-for="recibo in datos" :key="recibo.id_recibo" class="fila_mes" @click="emit('modificarRecibo', recibo)">
@@ -36,8 +74,15 @@
                 <strong>{{ recibo.fecha?.split("T")[0] }}</strong>
             </div>
             <div class="col_movimientos">
-                <strong class="ingreso">{{ recibo.detalle }}</Strong>
-                <span class="gasto">{{recibo.tipo === "gasto" ? recibo.importe * -1 : recibo.importe}}€</span>
+                <strong class="detalle">{{ recibo.detalle }}</Strong>
+                <div v-if="recibo.id_recibo === reciboEditando" class="editor_importe">
+                    <button class="btn_inline ko" @click.stop="cancelarEdicion()"><span class="material-symbols-outlined">close</span></button>
+                    <input type="number" step="0.01" v-model="importeTemporal" @click.stop class="input_inline">
+                    <button class="btn_inline ok" @click.stop="guardarImporte(recibo)"><span class="material-symbols-outlined">check</span></button>
+                </div>
+                <div v-else class="importe_click" @click.stop="activarEdicion(recibo)" title="Editar importe">
+                    <span class="importe">{{recibo.tipo === "gasto" ? recibo.importe * -1 : recibo.importe}}€</span>
+                </div>
             </div>
             <div class="col_saldo">
                 <strong>Estado:</strong>
@@ -56,8 +101,14 @@
         font-family: Verdana, Geneva, Tahoma, sans-serif;
     }
 
+    .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined' !important;
+    }
+
     .fecha {
         text-align: center;
+        display: flex;
+        justify-content: space-between;
     }
 
     .fila_mes {
@@ -77,7 +128,7 @@
     .col_movimientos {
         display: flex;
         flex-direction: column;
-        text-align: right;
+        text-align: center;
     }
 
     .col_saldo {
@@ -93,5 +144,68 @@
     .negativo {
         color :rgb(252, 98, 98)
     }
+
+    .btn_mes {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn_mes:hover {
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border-radius: 6px;
+    }
+
+    .importe_click {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.importe_click:hover {
+    background-color: #e0e0ff;
+}
+
+.icono_editar {
+    font-size: 16px;
+    color: #5754ff;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.importe_click:hover .icono_editar {
+    opacity: 1; 
+}
+
+.editor_importe {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.input_inline {
+    width: 70px;
+    padding: 4px;
+    border: 1px solid #5754ff;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.btn_inline {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.btn_inline.ok { color: #10b981; } 
+.btn_inline.ko { color: #ef4444; } 
    
 </style>

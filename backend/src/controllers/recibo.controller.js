@@ -63,6 +63,24 @@ const patchEstado = async (req, res) => {
     }
 }
 
+const patchImporte = async (req, res) => {
+    try{
+        const id_recibo = req.params.id_recibo;
+        const id_hogar = req.usuario.id_hogar;
+        const importe = req.body.importe;
+
+        const recibo = await reciboService.modificarImporte(id_recibo, id_hogar, importe);
+        if(recibo){
+            res.status(200).json({ mensaje: "Importe modificado correctamente" });
+        }else{
+            res.status(404).json({error: "Recibo no encontrado"});
+        }
+    }catch (err) {
+        console.error("Error al modificar el recibo", err);
+        res.status(500).json({error: "Error interno del servidor"});
+    }
+}
+
 const putRecibo = async (req, res) => {
     try{
         const id_recibo = req.params.id_recibo;
@@ -134,5 +152,6 @@ module.exports = {
     patchEstado,
     putRecibo,
     deleteRecibo,
-    getResumen
+    getResumen,
+    patchImporte
 };

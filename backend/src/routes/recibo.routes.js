@@ -134,6 +134,41 @@ router.patch("/api/v1/recibos/:id_recibo", authMiddleware.verificarToken, authMi
 
 /**
  * @swagger
+ * /api/v1/recibos/importe/{id_recibo}:
+ *   patch:
+ *     summary: Cambia el importe del recibo
+ *     tags: [Recibos]
+ *     security:
+ *     - bearerAuth: []
+ *     parameters:
+ *     - in: path
+ *       name: id_recibo
+ *       required: true
+ *       schema:
+ *         type: integer
+ *       description: Id del recibo a modificar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               importe:
+ *                 type: number
+ *                 description: Importe del recibo
+ *     responses:
+ *       200:
+ *         description: Estado modificado correctamente
+ *       404:
+ *         description: Recibo no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.patch("/api/v1/recibos/importe/:id_recibo", authMiddleware.verificarToken, authMiddleware.verificarAccesoTotal, reciboController.patchImporte);
+
+/**
+ * @swagger
  * /api/v1/recibos/{id_recibo}:
  *   put:
  *     summary: Crea un recibo nuevo
