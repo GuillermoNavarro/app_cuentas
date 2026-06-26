@@ -20,6 +20,8 @@
     const emit = defineEmits(['volverDetalle']);
     const props = defineProps(['datosRecibo']);
 
+    const reciboUnico = ref(false);
+
     const vista = computed(() => {
         return props.datosRecibo ? 'editar' : 'nuevo';
     });
@@ -143,12 +145,18 @@
         if(vista.value === 'editar'){
             Object.assign(formulario.value, props.datosRecibo);
             formulario.value.fecha = formatearFecha(formulario.value.fecha);
-        } 
+            if(!formulario.value.id_previsto){
+                formulario.value.mostrar = 'unico';
+                reciboUnico.value = true;
+            }
+        }else{
+            reciboUnico.value = false;
+        }
     });
 </script>
 
 <template>
-    <div class="radio_grupo">
+    <div class="radio_grupo" v-if="reciboUnico === false">
         <label class="radio_tipo">
             <input type="radio" value="unico" v-model="formulario.mostrar">
             <span>Unico</span> 

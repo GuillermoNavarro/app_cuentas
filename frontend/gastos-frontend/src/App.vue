@@ -5,6 +5,7 @@
   import Resumen from './components/resumen.vue';
   import Recibos from './components/recibos.vue';
   import Formulario from './components/formulario.vue';
+  import Usuario from './components/usuario.vue';
   const cerrarLogin = ref(localStorage.getItem('token') ? true : false);
   const vistaActual = ref('detalle');  
   const reciboSeleccionado = ref(null);
@@ -28,7 +29,7 @@
   <Resumen v-if="vistaActual === 'resumen' && cerrarLogin" @verDetalle="verDetalle"/>
   <Recibos v-if="vistaActual === 'detalle' && cerrarLogin" @modificarRecibo="prepararEdicion" :mesRecibido="mesSeleccionado"/>
   <Formulario v-if="vistaActual === 'nuevo' && cerrarLogin" @volverDetalle="vistaActual ='detalle'" :datosRecibo="reciboSeleccionado"/>
-  <h2 v-if="vistaActual === 'usuario' && cerrarLogin">Usuario</h2>
+  <Usuario v-if="vistaActual === 'usuario' && cerrarLogin" />
   <Navbar
     v-if="cerrarLogin"
     :vistaActual="vistaActual"

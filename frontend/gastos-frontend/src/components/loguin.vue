@@ -1,34 +1,22 @@
 <script setup>
 import { ref } from 'vue';
+import { login } from '../servicios/usuarioService';
 const mostrarPass = ref(false);
-const password = ref('');
-const email = ref('');
+
+const datos = ref({
+    email: null,
+    password: null
+})
 
 const emit = defineEmits(['usuarioLogado']);
 
-const hacerLogin = async () => {
-    const path = `${import.meta.env.VITE_API_URL}/api/v1/login`;
-
-    const opciones = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email: email.value, password: password.value })
-    };
-    try {
-        const respuesta = await fetch(path, opciones);
-        const datos = await respuesta.json();
-        if(respuesta.status === 200) {
-            localStorage.setItem('token', datos);
-            emit('usuarioLogado');
-        }else{
-            alert(datos.error);
-        }
-    } catch (err) {
-        console.log("error del servidor", err)
+const hacerLogin = async() => {
+    const respuesta = await login(datos.value);
+    if (respuesta){
+        emit('usuarioLogado');
     }
 }
+
 </script>
 
 <template>
@@ -38,12 +26,12 @@ const hacerLogin = async () => {
             <div>
                 <div class="grupo_input">
                     <label for="email">Email</label>
-                    <input type="email" id="email" v-model="email" required>
+                    <input type="email" id="email" v-model="datos.email" required>
                 </div>
                 <div class="grupo_input">
                     <label for="pass">Password</label>
                     <div class="input_btn">
-                        <input :type="mostrarPass ? 'text' : 'password'" id="pass" v-model="password" required>
+                        <input :type="mostrarPass ? 'text' : 'password'" id="pass" v-model="datos.password" required>
                         <button class="btn_ocultar" type="button" @click="mostrarPass = !mostrarPass"><span class="material-symbols-outlined">{{  mostrarPass ? 'visibility_off' : 'visibility'}}</span></button>
                     </div>
                 </div>
