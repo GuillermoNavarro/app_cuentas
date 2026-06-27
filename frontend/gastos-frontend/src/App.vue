@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from 'vue';
+  import { onMounted, ref } from 'vue';
   import Login from './components/loguin.vue';
   import Navbar from './components/navbar.vue'
   import Resumen from './components/resumen.vue';
@@ -28,20 +28,54 @@
   const logado = (cambiar_pass, nombre) => {
     datosToken.value.cambiar_pass = cambiar_pass;
     datosToken.value.nombre = nombre;
-    cerrarLogin.value = true;
+    
 
     if(cambiar_pass === 1){
       vistaActual.value = 'usuario';
     }else {
       vistaActual.value = 'detalle';
     }
+
+    cerrarLogin.value = true;
   }
+
+  const iniciarSesion = () => {
+    const token = localStorage.getItem('token');
+    if(token){
+      try{
+          const payloadBase64 = token.split('.')[1];
+          const payloadDecodificado = JSON.parse(atob(payloadBase64));
+          datosToken.value.nombre = payloadDecodificado.nombre;
+          datosToken.value.cambiar_pass = payloadDecodificado.cambiar_pass;
+          cerrarLogin.value = true;
+          if(payloadDecodificado.cambiar_pass === 1){
+            vistaActual.value = 'usuario';
+          }else{
+          vistaActual.value = 'detalle';
+          }
+      }catch (err) {
+          console.error("Error al decodificar el token", err)
+          return null;
+      }
+    }
+  }
+
+  onMounted(() => {
+    iniciarSesion();
+  })
 
 </script>
 
 <template>
-  <h1 class="titulo">Gestion de Cuentas del Hogar</h1>
-  <Login @usuarioLogado="logado"  v-if="!cerrarLogin"/>
+  <header class="cabecera">
+    <h1 class="titulo">Gestion de Cuentas</h1>
+    <div v-if="cerrarLogin && datosToken.nombre" class="saludo_usuario">
+      <span>Hola, {{ datosToken.nombre }}</span>
+    </div>
+  </header>
+  
+
+  <Login @usuarioLogado="iniciarSesion"  v-if="!cerrarLogin"/>
   <Resumen v-if="vistaActual === 'resumen' && cerrarLogin" @verDetalle="verDetalle"/>
   <Recibos v-if="vistaActual === 'detalle' && cerrarLogin" @modificarRecibo="prepararEdicion" :mesRecibido="mesSeleccionado"/>
   <Formulario v-if="vistaActual === 'nuevo' && cerrarLogin" @volverDetalle="vistaActual ='detalle'" :datosRecibo="reciboSeleccionado"/>
@@ -57,12 +91,34 @@
 </template>
 
 <style scoped>
+ .cabecera {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+    
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .titulo {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #ccc;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .saludo_usuario {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #666;
+    font-family: Verdana, sans-serif;
+    font-size: 0.85rem;
   }
 </style>
 

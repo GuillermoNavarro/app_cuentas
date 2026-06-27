@@ -13,20 +13,7 @@ const emit = defineEmits(['usuarioLogado']);
 const hacerLogin = async() => {
     const respuesta = await login(datos.value);
     if (respuesta){
-        const token = decodificarToken();
-        emit('usuarioLogado', token.cambiar_pass, token.nombre);
-    }
-}
-
-const decodificarToken = () => {
-    try{
-        const token = localStorage.getItem('token');
-        const payloadBase64 = token.split('.')[1];
-        const payloadDecodificado = atob(payloadBase64);
-        return JSON.parse(payloadDecodificado);
-    }catch (err) {
-        console.error("Error al decodificar el token", err)
-        return null;
+        emit('usuarioLogado');
     }
 }
 

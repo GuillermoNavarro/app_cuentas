@@ -34,7 +34,7 @@
             </div>
             <div class="col_saldo">
                 <strong>Saldo:</strong>
-                <strong :class="(mesDatos.ingreso - mesDatos.gasto) > 0 ? 'positivo' : 'negativo'">{{ mesDatos.ingreso - mesDatos.gasto}}€</strong>
+                <strong :class="(mesDatos.ingreso - mesDatos.gasto) > 0 ? 'positivo' : 'negativo'">{{ (mesDatos.ingreso - mesDatos.gasto).toFixed(2)}}€</strong>
             </div>
         </div>
     </div>
