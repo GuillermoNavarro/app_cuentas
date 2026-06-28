@@ -310,5 +310,9 @@
         width: 100%;
         gap: 5px;
     }
+
+    input {
+        font-size: 16px;
+    }
         
 </style>

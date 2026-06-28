@@ -37,7 +37,7 @@
 <style scoped>
     .barra_flotante {
         position: fixed;
-        bottom: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         left: 50%;
         transform: translateX(-50%);
         width: 90%;
@@ -48,7 +48,7 @@
         align-items: center;
         background-color: white;
         padding: 10px 20px;
-        border-radius: 30px;
+        border-radius: 20px;
         box-shadow: 0 4px 15px rgba(0, 0,0, 0.1);
     }
 

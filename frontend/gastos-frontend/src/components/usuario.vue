@@ -130,6 +130,7 @@ input {
     border: 1px solid #ccc;
     border-radius: 6px;
     box-sizing: border-box;
+    font-size: 16px;
 }
 
 input:focus {

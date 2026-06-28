@@ -101,9 +101,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: env(sage-area-inset-top, 0px) 20px 10px 20px;
     border-bottom: 1px solid #ccc;
-    margin-bottom: 15px;
+    
     background-color: white;
     z-index: 1000;
   }
@@ -111,7 +111,7 @@
   .titulo {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: bold;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     margin: 0;
   }
 
@@ -129,6 +129,6 @@
 <style>
   #app {
     padding-bottom: 100px;
-    padding-top: 50px;
+    padding-top: 75px;
   }
 </style>

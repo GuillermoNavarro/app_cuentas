@@ -26,12 +26,12 @@ const hacerLogin = async() => {
             <div>
                 <div class="grupo_input">
                     <label for="email">Email</label>
-                    <input type="email" id="email" v-model="datos.email" required>
+                    <input type="email" id="email" v-model="datos.email" autocomplete="username" required>
                 </div>
                 <div class="grupo_input">
                     <label for="pass">Password</label>
                     <div class="input_btn">
-                        <input :type="mostrarPass ? 'text' : 'password'" id="pass" v-model="datos.password" required>
+                        <input :type="mostrarPass ? 'text' : 'password'" id="pass" v-model="datos.password" autocomplete="current-password" required>
                         <button class="btn_ocultar" type="button" @click="mostrarPass = !mostrarPass"><span class="material-symbols-outlined">{{  mostrarPass ? 'visibility_off' : 'visibility'}}</span></button>
                     </div>
                 </div>
@@ -70,6 +70,7 @@ const hacerLogin = async() => {
     }
 
     input {
+        font-size: 16px;
         width: 100%;
         padding: 12px;
         border: 1px solid #ccc;

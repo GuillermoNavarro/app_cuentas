@@ -254,6 +254,7 @@ onMounted(async () => {
     border: 1px solid #5754ff;
     border-radius: 4px;
     text-align: center;
+    font-size: 16px;
 }
 
 .btn_inline {
@@ -320,7 +321,8 @@ onMounted(async () => {
 
 header {
     position: fixed;
-    top: 58px;
+    top: 0;
+    padding-top: calc(50px + env(safe-area-inset-top, 0px));
     left: 50%;
     transform: translateX(-50%);
     width: 100%;
@@ -332,6 +334,6 @@ header {
 }
 
 .contenedor {
-    padding-top: 70px;
+    padding-top: calc(45px + env(safe-area-inset-top, 0px));
 }
 </style>
