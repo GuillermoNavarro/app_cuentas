@@ -11,11 +11,21 @@
         passNueva: null
     });
 
+    const validarPass = (password) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        return regex.test(password);
+    }
+
     const rePass =ref(null);
 
     const usuarios = ref(null);
 
     const pass = async () => {
+        if(!validarPass(datos.value.passNueva)){
+            window.alert("La contraseña debe tener al menos 8 caracteres, una mayuscula, una minuscula y un numero");
+            return;
+        }
+
         if(datos.value.passNueva === rePass.value){
             const respuesta = await cambioPass(datos.value);
             if(respuesta){
@@ -55,7 +65,7 @@
             </div>
             <label for="newPass">Nueva Contraseña</label>
             <div class="input_btn">
-                <input id="newPass" :type="mostrarPassNew ? 'text' : 'password'" v-model="datos.passNueva">
+                <input id="newPass" :type="mostrarPassNew ? 'text' : 'password'" v-model="datos.passNueva" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
                 <button class="btn_ocultar" type="button" @click="mostrarPassNew = !mostrarPassNew"><span class="material-symbols-outlined">{{  mostrarPassNew ? 'visibility_off' : 'visibility'}}</span></button>
             </div>
             <label for="rePass">Confirma nueva Contraseña</label>

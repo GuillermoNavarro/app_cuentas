@@ -37,14 +37,14 @@ const cargarDatos = async () => {
         }
         dato.total = total.toFixed(2);
 
-        if(dato.tipo === 'gasto'){
-            if(dato.estado){
+        if (dato.tipo === 'gasto') {
+            if (dato.estado) {
                 pagado.value += importe;
-            }else{
+            } else {
                 pendiente.value += importe;
             }
         }
-    });   
+    });
     datos.value = datosCrudos;
 }
 
@@ -83,32 +83,39 @@ const formatearFechaCorta = (fecha) => {
     return `${fechaModif.getDate().toString().padStart(2, '0')} - ${(letrasDia[fechaModif.getDay()])}`;
 }
 
+const obtenerTextoEstado = (recibo) => {
+    if(!recibo.estado) return "Pendiente";
+    return recibo.tipo === 'gasto' ? "Pagado" : "Cobrado"; 
+}
+
 onMounted(async () => {
     cargarDatos();
 })
 </script>
 
 <template>
-    <div class="valores">
-        <div class="pagado">
-            <span>Pag: </span>
-            <span>{{ pagado.toFixed(2) }} €</span>
+    <header>
+        <div class="valores">
+            <div class="pagado">
+                <span>Pag: </span>
+                <span>{{ pagado.toFixed(2) }} €</span>
+            </div>
+            <div class="pendiente">
+                <span>Pdt: </span>
+                <span>{{ pendiente.toFixed(2) }} €</span>
+            </div>
         </div>
-        <div class="pendiente">
-            <span>Pdt: </span>
-            <span>{{ pendiente.toFixed(2) }} €</span>
+        <div class="fecha">
+            <button class="btn_mes" @click="retrocedeMes"><span
+                    class="material-symbols-outlined">chevron_left</span></button>
+            <div>
+                <span>Selección de fecha: </span>
+                <input class="calendario" type="month" v-model="fechaSeleccionada" @change="cargarDatos()">
+            </div>
+            <button class="btn_mes" @click="avanzarMes"><span
+                    class="material-symbols-outlined">chevron_right</span></button>
         </div>
-    </div>
-    <div class="fecha">
-        <button class="btn_mes" @click="retrocedeMes"><span
-                class="material-symbols-outlined">chevron_left</span></button>
-        <div>
-            <span>Selección de fecha: </span>
-            <input class="calendario" type="month" v-model="fechaSeleccionada" @change="cargarDatos()">
-        </div>
-        <button class="btn_mes" @click="avanzarMes"><span
-                class="material-symbols-outlined">chevron_right</span></button>
-    </div>
+    </header>
     <div v-if="datos" class="contenedor">
         <div v-for="recibo in datos" :key="recibo.id_recibo" class="fila_mes" @click="emit('modificarRecibo', recibo)">
             <div class="col_fechas">
@@ -132,7 +139,7 @@ onMounted(async () => {
 
                 <span @click.stop="modificarEstado(recibo.id_recibo)" class="estado_click"
                     :class="recibo.estado ? 'estado_pagado' : 'estado_pendiente'">
-                    {{ recibo.estado ? "Pagado" : "Pendiente" }}
+                    {{ obtenerTextoEstado(recibo) }}
                 </span>
                 <span :class="recibo.total >= 0 ? 'positivo' : 'negativo'"> {{ recibo.total }} €</span>
             </div>
@@ -309,5 +316,22 @@ onMounted(async () => {
     margin-bottom: 5px;
     color: #979797;
 
+}
+
+header {
+    position: fixed;
+    top: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+    z-index: 800;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 5px;
+}
+
+.contenedor {
+    padding-top: 70px;
 }
 </style>

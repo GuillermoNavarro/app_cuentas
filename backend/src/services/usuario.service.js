@@ -2,12 +2,20 @@ const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+const validarPass = (password) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        return regex.test(password);
+    }
+
 const cambioPass = async (passAntigua, passNueva, usuarioJwt) => {
     const [usuario] = await pool.promise().query("SELECT password, cambiar_pass FROM usuario WHERE id_usuario = ?", [usuarioJwt.id_usuario]);
     const flag = await bcrypt.compare(passAntigua, usuario[0].password);
     if(!flag){
         throw new Error("INVALID_CREDENTIALS");
     };
+    if(!validarPass(passNueva)){
+        throw new Error("INVALID_CREDENTIALS");
+    } 
     const newPass = await bcrypt.hash(passNueva, 10);
     const [cambio] = await pool.promise().query("UPDATE usuario SET password = ?, cambiar_pass = 0 WHERE id_usuario = ?", [newPass, usuarioJwt.id_usuario]);
     
