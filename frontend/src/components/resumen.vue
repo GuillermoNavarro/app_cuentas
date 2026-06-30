@@ -51,6 +51,7 @@
 
     .fecha {
         text-align: center;
+        margin-top: -30px;
     }
 
     .fila_mes {

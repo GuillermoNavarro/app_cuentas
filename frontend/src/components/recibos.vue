@@ -135,22 +135,16 @@ onMounted(async () => {
                 </div>
             </div>
             <div class="col_saldo">
-                <!--<strong>Estado:</strong>-->
-
                 <span @click.stop="modificarEstado(recibo.id_recibo)" class="estado_click"
                     :class="recibo.estado ? 'estado_pagado' : 'estado_pendiente'">
                     {{ obtenerTextoEstado(recibo) }}
                 </span>
                 <span :class="recibo.total >= 0 ? 'positivo' : 'negativo'"> {{ recibo.total }} €</span>
             </div>
-            <!--<div class=" col_saldo">
-                    <strong>Total:</strong>
-                    <span> {{ recibo.total }} €</span>
-            </div>-->
         </div>
     </div>
-    <div v-else>
-        <h3>Cargando datos del mes...</h3>
+    <div v-else class="contenedor">
+        <h3>Conectanod con servidor ...</h3>
     </div>
 
 </template>

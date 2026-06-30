@@ -1,11 +1,13 @@
 <script setup>
-  import { onMounted, ref } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import Login from './components/loguin.vue';
   import Navbar from './components/navbar.vue'
   import Resumen from './components/resumen.vue';
   import Recibos from './components/recibos.vue';
   import Formulario from './components/formulario.vue';
   import Usuario from './components/usuario.vue';
+  import { useRegisterSW } from 'virtual:pwa-register/vue'
+  const { needRefresh, updateServiceWorker } = useRegisterSW();
   const cerrarLogin = ref(localStorage.getItem('token') ? true : false);
   const vistaActual = ref('detalle');  
   const reciboSeleccionado = ref(null);
@@ -39,6 +41,11 @@
     cerrarLogin.value = true;
   }
 
+  const actualizarSW = async () => {
+    const confirmacion = window.confirm("Nueva version disponible ¿Actualizar?");
+    if(confirmacion){updateServiceWorker();}
+  }
+
   const iniciarSesion = () => {
     const token = localStorage.getItem('token');
     if(token){
@@ -59,6 +66,10 @@
       }
     }
   }
+
+  watch(needRefresh, (nuevoValor) => {
+    if(nuevoValor){actualizarSW();}
+  })
 
   onMounted(() => {
     iniciarSesion();

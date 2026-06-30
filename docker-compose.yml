@@ -1,0 +1,40 @@
+services:
+  database:
+    image: mariadb:11.4
+    container_name: app-cuentas-db
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - 3309:${DB_PORT}
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data_mariadb:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./backend
+    container_name: app-cuentas-backend
+    restart: always
+    depends_on:
+      - database
+    env_file:
+      - ./.env
+    environment:
+      NODE_ENV: "production"
+      PORT: 3001
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: app-cuentas-frontend
+    restart: always
+    ports:
+      - "81:80"
+

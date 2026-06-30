@@ -60,17 +60,17 @@
         <form @submit.prevent="pass()">
             <label for="oldPass">Constraseña Actual</label>
             <div class="input_btn">
-                <input id="oldPass" :type="mostrarPassOld ? 'text' : 'password'" v-model="datos.passAntigua">
+                <input id="oldPass" :type="mostrarPassOld ? 'text' : 'password'" v-model="datos.passAntigua" required>
                 <button class="btn_ocultar" type="button" @click="mostrarPassOld = !mostrarPassOld"><span class="material-symbols-outlined">{{  mostrarPassOld ? 'visibility_off' : 'visibility'}}</span></button>
             </div>
             <label for="newPass">Nueva Contraseña</label>
             <div class="input_btn">
-                <input id="newPass" :type="mostrarPassNew ? 'text' : 'password'" v-model="datos.passNueva" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+                <input id="newPass" :type="mostrarPassNew ? 'text' : 'password'" v-model="datos.passNueva" placeholder="8 caracteres, 1 num, 1 mayus, 1 minus" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" required>
                 <button class="btn_ocultar" type="button" @click="mostrarPassNew = !mostrarPassNew"><span class="material-symbols-outlined">{{  mostrarPassNew ? 'visibility_off' : 'visibility'}}</span></button>
             </div>
             <label for="rePass">Confirma nueva Contraseña</label>
             <div class="input_btn">
-                <input id="rePass" :type="mostrarPassRe ? 'text' : 'password'" v-model="rePass">
+                <input id="rePass" :type="mostrarPassRe ? 'text' : 'password'" v-model="rePass" required>
                 <button class="btn_ocultar" type="button" @click="mostrarPassRe = !mostrarPassRe"><span class="material-symbols-outlined">{{  mostrarPassRe ? 'visibility_off' : 'visibility'}}</span></button>
             </div>
             <button class="btn_pass">Cambiar Contraseña</button>
@@ -90,7 +90,7 @@
 
 .lista_user, .cambio_pass {
     max-width: 500px;
-    margin: 0 auto;
+    margin: -60px auto;
     padding: 15px 10px;
 }
 
