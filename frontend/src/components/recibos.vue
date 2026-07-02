@@ -1,11 +1,20 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { reciboMensual, cambiarEstado, cambiarImporte } from '../servicios/reciboService';
 
 const props = defineProps(['mesRecibido', 'usuarioDeslogado']);
 const emit = defineEmits(['modificarRecibo']);
 const pagado = ref(0);
 const pendiente = ref(0);
+const estadoFiltro = ref(false);
+
+const datosfiltrados = computed(() => {
+    if (!datos.value) return [];
+    if(estadoFiltro.value){
+        return datos.value.filter(recibo => recibo.tipo === 'gasto' && recibo.estado === 0);
+    }
+    return datos.value;
+})
 
 const fecha = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`;
 const fechaSeleccionada = ref(props.mesRecibido || fecha);
@@ -100,6 +109,9 @@ onMounted(async () => {
                 <span>Pag: </span>
                 <span>{{ pagado.toFixed(2) }} €</span>
             </div>
+            <button class="filtro" :class="{ 'filtro-activo' : estadoFiltro }" @click="estadoFiltro = !estadoFiltro">
+                <span class="material-symbols-outlined">{{ estadoFiltro ? 'filter_alt_off' : 'filter_alt' }}</span>
+            </button>
             <div class="pendiente">
                 <span>Pdt: </span>
                 <span>{{ pendiente.toFixed(2) }} €</span>
@@ -117,7 +129,7 @@ onMounted(async () => {
         </div>
     </header>
     <div v-if="datos" class="contenedor">
-        <div v-for="recibo in datos" :key="recibo.id_recibo" class="fila_mes" @click="emit('modificarRecibo', recibo)">
+        <div v-for="recibo in datosfiltrados" :key="recibo.id_recibo" class="fila_mes" @click="emit('modificarRecibo', recibo)">
             <div class="col_fechas">
                 <strong>{{ formatearFechaCorta(recibo.fecha) }}</strong>
             </div>
@@ -330,4 +342,25 @@ header {
 .contenedor {
     padding-top: calc(45px + env(safe-area-inset-top, 0px));
 }
+
+.filtro {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #979797;
+    transition: all 0.2s ease;
+}
+
+.filtro:hover {
+    color: #555555;
+}
+
+.filtro-activo {
+    color: #111111
+}
+
 </style>
