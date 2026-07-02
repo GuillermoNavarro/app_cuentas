@@ -5,7 +5,7 @@ const obtenerTodos = async (id_hogar, mes, anio) => {
     const primerDia = new Date(anio, mes - 1, 1);
     const ultimoDia = new Date(anio, mes, 0);
 
-    const [filas] = await pool.promise().query("SELECT * FROM recibo WHERE id_hogar = ? AND fecha BETWEEN ? AND ?", [id_hogar, primerDia.toISOString().split('T')[0], ultimoDia.toISOString().split('T')[0]]);
+    const [filas] = await pool.promise().query("SELECT * FROM recibo WHERE id_hogar = ? AND fecha BETWEEN ? AND ? ORDER BY fecha ASC", [id_hogar, primerDia.toISOString().split('T')[0], ultimoDia.toISOString().split('T')[0]]);
     return filas;
 };
 
@@ -44,6 +44,7 @@ const resumenAnual = async (id_hogar, fecha) => {
     const fechaFin = new Date(fecha);
     fechaInicio.setMonth(fechaInicio.getMonth() - 3);
     fechaFin.setMonth(fechaFin.getMonth() + 9);
+    fechaFin.setDate(0)
     const query = `
         SELECT 
             DATE_FORMAT(fecha, '%Y-%m') as mes, 

@@ -112,7 +112,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: env(sage-area-inset-top, 0px) 20px 10px 20px;
+    padding: env(safe-area-inset-top, 0px) 20px 10px 20px;
     border-bottom: 1px solid #ccc;
     
     background-color: white;

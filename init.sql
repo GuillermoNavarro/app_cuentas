@@ -37,3 +37,4 @@ ALTER TABLE usuario ADD CONSTRAINT fk_usuario_hogar FOREIGN KEY (id_hogar) REFER
 ALTER TABLE previsto ADD CONSTRAINT fk_previsto_hogar  FOREIGN KEY (id_hogar) REFERENCES hogar (id_hogar) ON DELETE CASCADE;
 ALTER TABLE recibo ADD CONSTRAINT fk_recibo_hogar FOREIGN KEY (id_hogar) REFERENCES hogar (id_hogar) ON DELETE CASCADE;
 ALTER TABLE recibo ADD CONSTRAINT fk_recibo_previsto FOREIGN KEY (id_previsto) REFERENCES previsto (id_previsto) ON DELETE CASCADE;
+CREATE INDEX idx_recibo_fecha ON recibo (id_hogar, fecha);
