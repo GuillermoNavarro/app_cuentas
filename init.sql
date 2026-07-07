@@ -38,3 +38,6 @@ ALTER TABLE previsto ADD CONSTRAINT fk_previsto_hogar  FOREIGN KEY (id_hogar) RE
 ALTER TABLE recibo ADD CONSTRAINT fk_recibo_hogar FOREIGN KEY (id_hogar) REFERENCES hogar (id_hogar) ON DELETE CASCADE;
 ALTER TABLE recibo ADD CONSTRAINT fk_recibo_previsto FOREIGN KEY (id_previsto) REFERENCES previsto (id_previsto) ON DELETE CASCADE;
 CREATE INDEX idx_recibo_fecha ON recibo (id_hogar, fecha);
+
+INSERT INTO hogar (nombre) VALUES ('Hogar de Prueba');
+INSERT INTO usuario (nombre, email, id_hogar) VALUES ('Administrador', 'admin@cuentas.local', 1);
