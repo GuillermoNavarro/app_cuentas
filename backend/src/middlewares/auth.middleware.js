@@ -14,7 +14,9 @@ const verificarToken = async (req, res, next) => {
         next();
 
     }catch(err) {
-        console.error("Error de token", err);
+        if(err.name !== 'TokenExpiredError'){
+            console.error("Error de token", err.message);
+        }
         res.status(401).json({error: "Acceso no permitido"});
     }
 };
