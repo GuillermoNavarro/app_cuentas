@@ -3,8 +3,8 @@ services:
     image: mariadb:11.4
     container_name: app-cuentas-db
     restart: always
-    env_file:
-      - ./.env
+    #env_file:
+      #- ./.env
     #ports:
       #- 3309:${DB_PORT}
     environment:
@@ -15,6 +15,12 @@ services:
     volumes:
       - ./data_mariadb:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - db-net
 
@@ -23,12 +29,12 @@ services:
     container_name: app-cuentas-backend
     restart: always
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     env_file:
       - ./.env
     environment:
       NODE_ENV: "production"
-      PORT: 3001
     networks:
       - web-net
       - db-net
