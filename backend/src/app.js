@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-const routes = require("./routes/test.routes")
 const reciboRoutes = require("./routes/recibo.routes")
 const previstoRoutes = require("./routes/previsto.router");
 const usuarioRoutes = require("./routes/usuario.routes");
@@ -33,7 +32,6 @@ if (process.env.NODE_ENV === "development"){
 }
 
 app.use(express.json());
-app.use(routes);
 app.use(reciboRoutes);
 app.use(previstoRoutes);
 app.use(usuarioRoutes);
