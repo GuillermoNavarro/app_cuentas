@@ -1,15 +1,18 @@
 const pool = require("../config/db");
 const { crearRecibo } = require("./recibo.service");
+const { calcularFechaSiguiente } = require("./fecha.service");
 
 const crearPrevisto = async (detalle, fechaInicio, fechaFin, importe, tipo, id_hogar) => {
     const [registro] = await pool.promise().query("INSERT INTO previsto(detalle, fecha_inicio, fecha_fin, importe, tipo, id_hogar) VALUES (?,?,?,?,?,?)", [detalle, fechaInicio, fechaFin, importe, tipo, id_hogar]);
+    fechaFin = fechaInicio > fechaFin ? fechaInicio : fechaFin;      
     if(registro.affectedRows>0){
         let fechaActual = new Date(fechaInicio);
         const fecha = new Date(fechaFin);
         const id_previsto = registro.insertId;
-        while (fechaActual < fecha){
+        const diaOriginal = fechaActual.getUTCDate();
+        while (fechaActual <= fecha){
             await crearRecibo(id_previsto, id_hogar, fechaActual.toISOString().split('T')[0], importe, tipo, detalle);
-            fechaActual.setMonth(fechaActual.getMonth() +1);   
+            fechaActual = calcularFechaSiguiente(fechaActual, diaOriginal, 1);
         }
     }
     
@@ -65,5 +68,5 @@ module.exports = {
     crearPrevisto,
     obtenerPrevisto,
     modificarPrevisto,
-    borrarPrevisto
+    borrarPrevisto,
 };
