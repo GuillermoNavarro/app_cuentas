@@ -8,7 +8,7 @@ jest.mock("../src/services/recibo.service.js", () => ({
 
 const pool = require("../src/config/db");
 const { crearRecibo } = require("../src/services/recibo.service");
-const { crearPrevisto } = require("../src/services/previsto.service");
+const { crearPrevisto, obtenerPrevisto, modificarPrevisto, borrarPrevisto } = require("../src/services/previsto.service");
 
 let query;
 
@@ -232,6 +232,11 @@ describe("crearPrevisto", () => {
             7
         );
 
+
+        expect(query).toHaveBeenCalledWith(
+            expect.any(String),
+            ["Alquiler", "2026-05-15", "2026-05-15", 850, "gasto",7]
+        );
         expect(crearRecibo).toHaveBeenCalledTimes(1);
         expect(crearRecibo).toHaveBeenNthCalledWith(
             1,    
@@ -243,5 +248,134 @@ describe("crearPrevisto", () => {
             "Alquiler"
         );
 
+    });
+});
+
+describe("obtenerPrevisto", () => {
+    test("devuelve el previsto solicitado", async () => {
+        const previsto = {
+            id_previsto: 42,
+            detalle: "Alquiler",
+            fecha_inicio: "2026-01-15",
+            fecha_fin: "2026-05-15",
+            importe: 850,
+            tipo: "gasto",
+            id_hogar: 7
+        };
+
+        query.mockResolvedValueOnce([previsto]);
+
+        const resultado = await obtenerPrevisto(42, 7);
+
+        expect(query).toHaveBeenCalledWith(
+            "SELECT * FROM previsto WHERE id_previsto = ? AND id_hogar = ?", 
+            [42, 7]
+        );
+
+        expect(resultado).toEqual(previsto);
+    });
+
+    
+    test("no devuelve nada si el id_hogar no coincide", async () => {
+        query.mockResolvedValueOnce([[]]);
+
+        const resultado = await obtenerPrevisto(42, 2);
+
+        expect(query).toHaveBeenCalledWith(
+            "SELECT * FROM previsto WHERE id_previsto = ? AND id_hogar = ?", 
+            [42, 2]
+        );
+
+        expect(resultado).toEqual([]);
+    });
+
+    test("no devuelve nada si el id_previsto no existe", async () => {     
+        query.mockResolvedValueOnce([[]]);
+
+        const resultado = await obtenerPrevisto(45, 7);
+
+        expect(query).toHaveBeenCalledWith(
+            "SELECT * FROM previsto WHERE id_previsto = ? AND id_hogar = ?", 
+            [45, 7]
+        );
+
+        expect(resultado).toEqual([]);
+    });
+});
+
+describe("borrarPrevisto", () => {
+    test("elimina el previsto si no tiene recibos pagados", async () => {
+        query
+            .mockResolvedValueOnce([[{ fin_fecha: null}]])
+            .mockResolvedValueOnce([{ affectedRows: 1}]);
+
+        const resultado = await borrarPrevisto(42,7);
+
+        expect(query).toHaveBeenNthCalledWith(
+            1,
+            expect.stringContaining("SELECT max(fecha) AS fin_fecha FROM recibo"),
+            [42, 7],
+            
+        );
+
+        expect(query).toHaveBeenNthCalledWith(
+            2,
+            "DELETE FROM previsto WHERE id_previsto = ? AND id_hogar = ?", 
+            [42, 7]
+        );
+
+        expect(resultado).toBe(true);
+    });
+
+    test("no borra nada si el previsto no exite o si el id_hogar no coincide", async () => {
+        query
+            .mockResolvedValueOnce([[{ fin_fecha: null}]])
+            .mockResolvedValueOnce([{ affectedRows: 0}]);
+
+        const resultado = await borrarPrevisto(42,7);
+
+        expect(resultado).toBe(false);
+    });
+
+    test("si pagado y pendiente, actualiza previsto y borra los pendientes", async () => {
+        query
+            .mockResolvedValueOnce([[{ fin_fecha: "2026-03-15"}]])
+            .mockResolvedValueOnce([{ affectedRows: 1}])
+            .mockResolvedValueOnce([{ affectedRows: 2}]);
+
+        const resultado = await borrarPrevisto(42,7);
+
+        expect(query).toHaveBeenNthCalledWith(
+            1,
+            expect.stringContaining("SELECT max(fecha) AS fin_fecha FROM recibo"),
+            [42, 7]
+            
+        );
+
+        expect(query).toHaveBeenNthCalledWith(
+            2,
+            "UPDATE previsto SET fecha_fin = ? WHERE id_previsto = ? AND id_hogar = ?", 
+            ["2026-03-15", 42, 7]
+        );
+
+        expect(query).toHaveBeenNthCalledWith(
+            3,
+            expect.stringContaining("DELETE FROM recibo WHERE id_previsto"), 
+            [42, 7]
+        );
+
+        expect(resultado).toBe(true);
+    });
+
+    test("si esta todo pagado sigue devolviendo true aunque no borre nada", async () => {
+        query
+            .mockResolvedValueOnce([[{ fin_fecha: "2026-03-15"}]])
+            .mockResolvedValueOnce([{ affectedRows: 1}])
+            .mockResolvedValueOnce([{ affectedRows: 0}]);
+
+        const resultado = await borrarPrevisto(42,7);
+
+        expect(query).toHaveBeenCalledTimes(3);
+        expect(resultado).toBe(true);
     });
 });
